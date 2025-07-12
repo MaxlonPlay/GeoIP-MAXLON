@@ -35,7 +35,7 @@ def main() -> None:
         print("\nEsempi:")
         print("   python main.py --server")
         print("   python main.py 8.8.8.8")
-        print("   curl http://10.8.10.109:8888/8.8.8.8")
+        print("   curl http://<il-tuo-ip>:<porta-servizio>/8.8.8.8")
         print("\nIl daemon carica tutto in RAM una volta e risponde istantaneamente!")
         sys.exit(1)
 

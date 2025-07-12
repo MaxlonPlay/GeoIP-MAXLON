@@ -207,3 +207,4 @@ marimo/_lsp/
 __marimo__/
 notes
 /db
+geo_daemon.pid
