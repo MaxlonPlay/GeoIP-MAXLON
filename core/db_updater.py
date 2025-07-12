@@ -7,7 +7,7 @@ from pathlib import Path
 
 class DBUpdater:
     def __init__(self):
-        self.data_filename = os.getenv('DATA_FILENAME', '../db/networks.csv')
+        self.data_filename = os.getenv('DATA_FILENAME', './db/networks.csv')
         self.csv_url = os.getenv('CSV_DOWNLOAD_URL', 'https://ip.guide/bulk/networks.csv')
         self.temp_filename = self.data_filename + ".tmp"
         self.old_filename = self.data_filename + ".old"
