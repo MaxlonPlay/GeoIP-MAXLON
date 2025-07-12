@@ -31,6 +31,70 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 
 ---
 
+# GeoIP-MAXLON - Istruzioni d'Uso
+
+## Installazione
+
+Clona il repository:
+```bash
+git clone https://github.com/MaxlonPlay/GeoIP-MAXLON.git
+cd GeoIP-MAXLON
+```
+
+Installa le dipendenze:
+```bash
+apt install python3-pip
+pip install -r requirements.txt
+```
+
+Configura il file `.env`:
+```bash
+nano .env
+```
+> Modifica le variabili di configurazione secondo le tue necessità.
+
+## Utilizzo
+
+Per ottenere informazioni:
+```bash
+./main.py
+```
+
+Per avviare in modalità server (risposta quasi immediata):
+```bash
+./main.py --server
+```
+
+## Interfaccia Web
+
+Accedi tramite browser a:
+```
+http://<il-tuo-ip>:9880/<ip-da-analizzare>
+```
+> Sostituisci `<il-tuo-ip>` con l’indirizzo IP del tuo server e `<ip-da-analizzare>` con l’IP da analizzare.
+
+## Comandi disponibili
+
+### Uso:
+```
+./main.py --server            🔥 Avvia daemon (resta in background e abilita Web API)
+./main.py <IP>                ⚡ Query istantanea (usa daemon CLI)
+./main.py --standalone <IP>   🔧 Modalità standalone (non usa il daemon, caricamento dati al avvio modalità più lenta)
+./main.py --status            📊 Stato daemon
+./main.py --stop              🛑 Ferma daemon
+./main.py --dbupdate          🔄 Aggiorna il file networks.csv e la cache
+```
+
+### Esempi:
+```
+./main.py --server
+./main.py 8.8.8.8
+curl http://10.8.10.109:9880/8.8.8.8
+```
+
+> 💡 Il daemon carica tutto in RAM una volta e risponde istantaneamente!
+
+
 ## 🔌 Interfacce Flessibili
 
 ### 🖥️ Server CLI (Command Line Interface)
