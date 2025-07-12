@@ -1,6 +1,6 @@
 # 🌍 GeoIP-MAXLON
 
-**GeoIP-MAXLON** è un servizio ad alte prestazioni progettato per fornire **lookup istantanei di indirizzi IP**, associandoli a informazioni geografiche e di rete come il **blocco CIDR**, il **numero di Sistema Autonomo (ASN)**, l'**organizzazione** e il **paese**.
+**GeoIP-MAXLON** è un servizio ad alte prestazioni progettato per fornire **lookup quasi istantanei di indirizzi IP** in locale senza neccessità di connesione a internet grazie a  vari db pubblici come il DB ip.guide, il quale contiene informazioni geografiche e di rete come il **blocco CIDR**, il **numero di Sistema Autonomo (ASN)**, l'**organizzazione** e il **paese**.
 
 La sua architettura è ottimizzata per la velocità, caricando **tutti i dati rilevanti direttamente in RAM** per garantire risposte quasi immediate.
 
@@ -18,7 +18,7 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 ## 📦 Gestione Ottimizzata dei Dati
 
 - **Libreria Polars**:
-  - Utilizzata per il caricamento efficiente e la pulizia dei dati dal file CSV di origine (`networks.csv`).
+  - Utilizzata per il caricamento efficiente e la pulizia dei dati dal file CSV di origine.
 
 - **Struttura dati precomputata (`PrecomputedNetwork`)**:
   - Rappresenta le reti IPv4 e IPv6 in un formato binario ottimizzato per i controlli di inclusione IP basati sull’aritmetica intera.
@@ -43,6 +43,7 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 - Server HTTP leggero che espone un'API **RESTful**.
 - Facilita l’integrazione con applicazioni o servizi web.
 - Query effettuabili tramite semplici richieste `GET`:
+- Per futuri aggiornamenti sto pensando una WEBGUI completa
 
 
 ---
@@ -52,7 +53,7 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 - **Modalità Daemon (`--server`)**:
 - Avvia il servizio in background.
 - Abilita sia il server CLI che la Web API.
-- Gestisce il proprio PID per consentire controllo da riga di comando (start/stop/status).
+- Gestisce il proprio PID per consentire controllo da riga di comando (start/stop/status/dbupdate).
 
 - **Modalità Client (`<IP>`)**:
 - Se il daemon è in esecuzione, agisce da client.
@@ -60,7 +61,7 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 
 - **Modalità Standalone (`--standalone <IP>`)**:
 - Esegue un lookup IP diretto **senza interagire con il daemon**.
-- I dati vengono caricati al momento della richiesta.
+- I dati vengono caricati al momento della richiesta quinti tempi di avvio maggiori a seconda della dimensione del DB.
 - Ideale per test o usi occasionali **senza avviare un servizio persistente**.
 
 ---
@@ -69,6 +70,7 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 
 Per ogni lookup IP, il servizio restituisce:
 
+- Usando in locale il DB ip.guide, in future versione ho intensioni di espandelo ad altri DB
 - Blocco CIDR corrispondente
 - ASN
 - Organizzazione
@@ -92,7 +94,7 @@ Il daemon fornisce **statistiche dettagliate** tra cui:
 
 ## ✅ In Sintesi
 
-**GeoIP-MAXLON** è una soluzione **robusta e performante** per esigenze di lookup GeoIP, ideale per applicazioni che richiedono:
+**GeoIP-MAXLON** è una soluzione **robusta e performante** per esigenze di lookup GeoIP selfhosted, ideale per applicazioni che richiedono:
 
 - Risposte ultra rapide
 - Elevata disponibilità dei dati
