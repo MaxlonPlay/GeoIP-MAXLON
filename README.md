@@ -35,23 +35,47 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 
 ## Installazione
 
-Clona il repository:
+### 1. Clona il repository:
 ```bash
 git clone https://github.com/MaxlonPlay/GeoIP-MAXLON.git
 cd GeoIP-MAXLON
 ```
 
-Installa le dipendenze:
+### 2. Installa Python 3 e pip:
+
+#### Debian / Ubuntu:
 ```bash
-apt install python3-pip
+sudo apt update
+sudo apt install python3 python3-pip
+```
+
+#### Arch / Manjaro:
+```bash
+sudo pacman -S python python-pip
+```
+
+#### Fedora:
+```bash
+sudo dnf install python3 python3-pip
+```
+
+#### Alpine Linux:
+```bash
+sudo apk add python3 py3-pip
+```
+
+### 3. Installa le dipendenze Python:
+```bash
 pip install -r requirements.txt
 ```
 
-Configura il file `.env`:
+### 4. Configura il file `.env`:
 ```bash
 nano .env
 ```
 > Modifica le variabili di configurazione secondo le tue necessità.
+
+---
 
 ## Utilizzo
 
@@ -65,13 +89,17 @@ Per avviare in modalità server (risposta quasi immediata):
 ./main.py --server
 ```
 
+---
+
 ## Interfaccia Web
 
-Accedi tramite browser a:
+Apri il browser e accedi a:
 ```
-http://<il-tuo-ip>:9880/<ip-da-analizzare>
+http://<il-tuo-ip>:<porta-servizio>/<ip-da-analizzare>
 ```
 > Sostituisci `<il-tuo-ip>` con l’indirizzo IP del tuo server e `<ip-da-analizzare>` con l’IP da analizzare.
+
+---
 
 ## Comandi disponibili
 
@@ -89,10 +117,11 @@ http://<il-tuo-ip>:9880/<ip-da-analizzare>
 ```
 ./main.py --server
 ./main.py 8.8.8.8
-curl http://10.8.10.109:9880/8.8.8.8
+curl http://<il-tuo-ip>:<porta-servizio>/8.8.8.8
 ```
 
 > 💡 Il daemon carica tutto in RAM una volta e risponde istantaneamente!
+
 
 
 ## 🔌 Interfacce Flessibili
