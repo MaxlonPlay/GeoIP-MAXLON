@@ -64,7 +64,7 @@ class GeoIPLookupHandler(BaseHTTPRequestHandler):
             }
             asn_cidrs_list = lookup_service.get_asn_cidrs(matching_row['asn'])
             response_data['asn_cidrs_count'] = len(asn_cidrs_list)
-            response_data['asn_cidrs'] = asn_cidrs_list[:20]
+            response_data['asn_cidrs'] = asn_cidrs_list
             self._send_response(200, 'application/json', json.dumps(response_data, indent=2))
         else:
             response_data = {
