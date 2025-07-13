@@ -35,13 +35,18 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 
 ## Installazione
 
+## Windows
+ - Per Windows scaricare la versione ".exe" della cartella dist modifica il file .env ed esegui il ".exe"
+
+## Linux
+
 ### 1. Clona il repository:
 ```bash
 git clone https://github.com/MaxlonPlay/GeoIP-MAXLON.git
 cd GeoIP-MAXLON
 ```
 
-### 2. Installa Python 3 e pip:
+### 2. Installa Python 3 e pip se non sono gia presenti:
 
 #### Debian / Ubuntu:
 ```bash
@@ -81,12 +86,12 @@ nano .env
 
 Per ottenere informazioni:
 ```bash
-./main.py
+./GeoIP-MAXLON.py -h
 ```
 
 Per avviare in modalità server (risposta quasi immediata):
 ```bash
-./main.py --server
+./GeoIP-MAXLON.py
 ```
 
 ---
@@ -105,18 +110,19 @@ http://<il-tuo-ip>:<porta-servizio>/<ip-da-analizzare>
 
 ### Uso:
 ```
-./main.py --server            🔥 Avvia daemon (resta in background e abilita Web API)
-./main.py <IP>                ⚡ Query istantanea (usa daemon CLI)
-./main.py --standalone <IP>   🔧 Modalità standalone (non usa il daemon, caricamento dati al avvio modalità più lenta)
-./main.py --status            📊 Stato daemon
-./main.py --stop              🛑 Ferma daemon
-./main.py --dbupdate          🔄 Aggiorna il file networks.csv e la cache
+./GeoIP-MAXLON.py                     🔥 Avvia daemon (resta in background e abilita Web API)
+./GeoIP-MAXLON.py <IP>                ⚡ Query istantanea (usa daemon CLI)
+./GeoIP-MAXLON.py --standalone <IP>   🔧 Modalità standalone (non usa il daemon, caricamento dati al avvio modalità più lenta)
+./GeoIP-MAXLON.py --status            📊 Stato daemon
+./GeoIP-MAXLON.py --stop              🛑 Ferma daemon
+./GeoIP-MAXLON.py --dbupdate          🔄 Aggiorna il file networks.csv e la cache
+./GeoIP-MAXLON.py --help/-h           ℹ️ Ottieni info sul uso del programma
 ```
 
 ### Esempi:
 ```
-./main.py --server
-./main.py 8.8.8.8
+./GeoIP-MAXLON.py
+./GeoIP-MAXLON.py 8.8.8.8
 curl http://<il-tuo-ip>:<porta-servizio>/8.8.8.8
 ```
 
