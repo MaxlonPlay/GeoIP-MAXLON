@@ -36,7 +36,7 @@ La sua architettura è ottimizzata per la velocità, caricando **tutti i dati ri
 ## Installazione
 
 ## Windows
- - Per Windows scaricare la versione ".exe" della cartella dist modifica il file .env ed esegui il ".exe"
+ - Per Windows scaricare la versione ".exe" da Releases, modifica il file .env ed esegui il ".exe"
 
 ## Linux
 
