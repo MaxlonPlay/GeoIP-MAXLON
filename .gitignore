@@ -208,3 +208,5 @@ __marimo__/
 notes
 /db
 geo_daemon.pid
+version.txt
+build-windows.txt

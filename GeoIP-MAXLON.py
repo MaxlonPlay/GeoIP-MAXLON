@@ -24,20 +24,24 @@ DAEMON_PIDFILE = os.getenv('DAEMON_PIDFILE', 'geo_daemon.pid')
 
 def main() -> None:
     if len(sys.argv) < 2:
+        sys.argv.append('--server')
+
+    elif sys.argv[1] in ['--help', '-h']:
         print("🚀 GeoIP-MAXLON - Cache in RAM per query istantanee")
         print("\nUso:")
-        print("   python main.py --server           🔥 Avvia daemon (resta in background e abilita Web API)")
-        print("   python main.py <IP>               ⚡ Query istantanea (usa daemon CLI)")
-        print("   python main.py --standalone <IP>  🔧 Modalità standalone (non usa il daemon, caricamento dati al avvio modalità piu lenta)")
-        print("   python main.py --status           📊 Stato daemon")
-        print("   python main.py --stop             🛑 Ferma daemon")
-        print("   python main.py --dbupdate         🔄 Aggiorna il file networks.csv e la cache")
+        print("   python GeoIP-MAXLON.py                    🔥 Avvia daemon (resta in background e abilita Web API)")
+        print("   python GeoIP-MAXLON.py <IP>               ⚡ Query istantanea (usa daemon CLI)")
+        print("   python GeoIP-MAXLON.py --standalone <IP>  🔧 Modalità standalone (non usa il daemon, caricamento dati al avvio modalità più lenta)")
+        print("   python GeoIP-MAXLON.py --status           📊 Stato daemon")
+        print("   python GeoIP-MAXLON.py --stop             🛑 Ferma daemon")
+        print("   python GeoIP-MAXLON.py --dbupdate         🔄 Aggiorna il file networks.csv e la cache")
+        print("   python GeoIP-MAXLON.py -h/--help          ℹ️  Ottieni info sul uso del programma")
         print("\nEsempi:")
-        print("   python main.py --server")
-        print("   python main.py 8.8.8.8")
+        print("   python GeoIP-MAXLON.py")
+        print("   python GeoIP-MAXLON.py 8.8.8.8")
         print("   curl http://<il-tuo-ip>:<porta-servizio>/8.8.8.8")
-        print("\nIl daemon carica tutto in RAM una volta e risponde istantaneamente!")
-        sys.exit(1)
+        print("\n💡 Il daemon carica tutto in RAM una volta e risponde istantaneamente!")
+        sys.exit(0)
 
     command: str = sys.argv[1]
 
@@ -134,7 +138,7 @@ def main() -> None:
     elif command == '--dbupdate':
         if is_daemon_running():
             print("⚠️  Il daemon è in esecuzione. Si consiglia di fermarlo prima di aggiornare il DB.")
-            print("   Per favor, ferma il daemon con 'python main.py --stop' e riprova.")
+            print("   Per favor, ferma il daemon con 'python GeoIP-MAXLON.py --stop' e riprova.")
             sys.exit(1)
 
         updater = DBUpdater()
@@ -180,7 +184,7 @@ def main() -> None:
         ip_address: str = command
         if not is_daemon_running():
             print("❌ Daemon non in esecuzione!")
-            print("💡 Avvia con: python main.py --server")
+            print("💡 Avvia con: python GeoIP-MAXLON.py --server")
             sys.exit(1)
 
         start_time = time.time()

@@ -84,6 +84,7 @@ class GeoWebAPI:
 
     def start(self):
         print(f"🌐 Avvio Web API server su http://{self.daemon_web_host}:{self.daemon_web_port}")
+        print(f"🌐 Esempio d'uso http://{self.daemon_web_host}:{self.daemon_web_port}/216.58.205.46")
         server_address = (self.daemon_web_host, self.daemon_web_port)
         try:
             self.server = HTTPServer(server_address, GeoIPLookupHandler)
