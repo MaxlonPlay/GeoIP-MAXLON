@@ -9,7 +9,7 @@ from pathlib import Path
 try:
     import polars as pl
 except ImportError:
-    print("❌ Errore: Polars non è installato")
+    print("[ERROR] Errore: Polars non è installato")
     print("Installalo con: pip install polars")
     import sys
     sys.exit(1)
@@ -44,9 +44,9 @@ class GeoDataManager:
         self.ipv6_block_ranges = {}
         self.asn_cache = defaultdict(list)
         self.load_time = 0
-        print("🚀 GeoIP Data Manager - Avvio caricamento dati...")
+        print("[INFO] GeoIP Data Manager - Avvio caricamento dati...")
         self.load_data()
-        print(f"✅ Dati caricati in {self.load_time:.2f}s")
+        print(f"[INFO] Dati caricati in {self.load_time:.2f}s")
 
     def _get_cache_filename(self):
         csv_path = Path(self.filename)
@@ -77,7 +77,7 @@ class GeoDataManager:
             return False
 
     def _create_optimized_structures(self):
-        print("🔧 Ottimizzazione strutture dati...")
+        print("[INFO] Ottimizzazione strutture dati...")
         self.ipv4_networks.sort(key=lambda x: (x.network_int >> 24, x.network_int, -x.prefix_len))
         self.ipv6_networks.sort(key=lambda x: (x.network_int >> 112, x.network_int, -x.prefix_len))
         current_octet = None
@@ -108,7 +108,7 @@ class GeoDataManager:
             self.ipv6_block_ranges[current_block] = (start_idx, len(self.ipv6_networks))
 
     def _save_cache(self):
-        print("💾 Salvando cache...")
+        print("[INFO] Salvando cache...")
         cache_data = {
             'ipv4_networks': self.ipv4_networks,
             'ipv6_networks': self.ipv6_networks,
@@ -121,18 +121,18 @@ class GeoDataManager:
         try:
             with gzip.open(self.cache_filename, 'wb', compresslevel=6) as f:
                 pickle.dump(cache_data, f, protocol=pickle.HIGHEST_PROTOCOL)
-            print("✅ Cache salvato")
+            print("[INFO] Cache salvato")
         except Exception as e:
-            print(f"❌ Errore salvataggio cache: {e}")
+            print(f"[ERROR] Errore salvataggio cache: {e}")
 
     def _load_cache(self):
-        print("⚡ Caricamento cache...")
+        print("[INFO] Caricamento cache...")
         start_time = time.time()
         try:
             with gzip.open(self.cache_filename, 'rb') as f:
                 cache_data = pickle.load(f)
             if cache_data.get('version') != self.cache_version:
-                print(f"🔄 Cache obsoleto (versione corrente: {self.cache_version}, versione cache: {cache_data.get('version')}), rigenerazione...")
+                print(f"[INFO] Cache obsoleto (versione corrente: {self.cache_version}, versione cache: {cache_data.get('version')}), rigenerazione...")
                 return False
             self.ipv4_networks = cache_data['ipv4_networks']
             self.ipv6_networks = cache_data['ipv6_networks']
@@ -141,17 +141,17 @@ class GeoDataManager:
             self.asn_cache = defaultdict(list, cache_data['asn_cache'])
             self.load_time = time.time() - start_time
             total_networks = len(self.ipv4_networks) + len(self.ipv6_networks)
-            print(f"🚀 Cache caricato: {total_networks:,} reti in {self.load_time:.3f}s")
+            print(f"[INFO] Cache caricato: {total_networks:,} reti in {self.load_time:.3f}s")
             return True
         except Exception as e:
-            print(f"❌ Errore caricamento cache: {e}")
+            print(f"[ERROR] Errore caricamento cache: {e}")
             return False
 
     def load_data(self):
         start_time = time.time()
         if self._is_cache_valid() and self._load_cache():
             return
-        print("📂 Caricamento CSV con Polars...")
+        print("[INFO] Caricamento CSV con Polars...")
         self._load_csv_with_polars()
         self._create_optimized_structures()
         self._save_cache()
@@ -184,7 +184,7 @@ class GeoDataManager:
                 pl.col('organization').is_not_null() &
                 pl.col('country').is_not_null()
             )
-            print(f"📊 Processando {len(df):,} righe...")
+            print(f"[INFO] Processando {len(df):,} righe...")
             rows = df.to_dicts()
             ipv4_temp = []
             ipv6_temp = []
@@ -208,9 +208,9 @@ class GeoDataManager:
             self.ipv4_networks = ipv4_temp
             self.ipv6_networks = ipv6_temp
             total_networks = len(self.ipv4_networks) + len(self.ipv6_networks)
-            print(f"✅ Processate {total_networks:,} reti")
+            print(f"[INFO] Processate {total_networks:,} reti")
         except Exception as e:
-            print(f"❌ Errore CSV: {e}")
+            print(f"[ERROR] Errore CSV: {e}")
             raise
 
     def get_networks(self, is_ipv4):

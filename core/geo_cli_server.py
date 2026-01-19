@@ -14,7 +14,7 @@ class GeoCliServer:
         self.daemon_port = int(os.getenv('DAEMON_PORT', 8888))
 
     def start(self):
-        print(f"🔥 Avvio server CLI su {self.daemon_host}:{self.daemon_port}")
+        print(f"[INFO] Avvio server CLI su {self.daemon_host}:{self.daemon_port}")
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
@@ -27,12 +27,12 @@ class GeoCliServer:
                     threading.Thread(target=self._handle_client, args=(client_socket,), daemon=True).start()
                 except Exception as e:
                     if self.running:
-                        print(f"❌ Errore server CLI: {e}")
+                        print(f"[ERROR] Errore server CLI: {e}")
         except OSError as e:
-            print(f"❌ Errore avvio server CLI: {e} - Probabilmente la porta {self.daemon_port} è già in uso.")
+            print(f"[ERROR] Errore avvio server CLI: {e} - Probabilmente la porta {self.daemon_port} è già in uso.")
             raise
         except Exception as e:
-            print(f"❌ Errore generico server CLI: {e}")
+            print(f"[ERROR] Errore generico server CLI: {e}")
         finally:
             if self.server_socket:
                 self.server_socket.close()
@@ -67,8 +67,8 @@ class GeoCliServer:
             client_socket.close()
 
     def stop(self):
-        print("🛑 Fermando server CLI...")
+        print("[INFO] Fermando server CLI...")
         self.running = False
         if self.server_socket:
             self.server_socket.close()
-        print("🛑 Server CLI fermato.")
+        print("[INFO] Server CLI fermato.")

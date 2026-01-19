@@ -37,12 +37,12 @@ class DBUpdater:
                                 progress = (downloaded_size / total_size) * 100
                                 print(f"\r📥 Scaricamento: {downloaded_size / (1024*1024):.2f}MB / {total_size / (1024*1024):.2f}MB ({progress:.1f}%)", end='')
                             else:
-                                print(f"\r📥 Scaricamento: {downloaded_size / (1024*1024):.2f}MB", end='')
+                                print(f"\rScaricamento: {downloaded_size / (1024*1024):.2f}MB", end='')
                             start_time = time.time()
-                print("\n✅ Scaricamento completato.")
+                print("\n[INFO] Scaricamento completato.")
             return True
         except requests.exceptions.RequestException as e:
-            print(f"❌ Errore durante il download del CSV: {e}")
+            print(f"[ERROR] Errore durante il download del CSV: {e}")
             if os.path.exists(self.temp_filename):
                 os.remove(self.temp_filename)
             return False

@@ -83,23 +83,23 @@ class GeoWebAPI:
         self.daemon_web_port = int(os.getenv('DAEMON_WEB_PORT', 8888))
 
     def start(self):
-        print(f"🌐 Avvio Web API server su http://{self.daemon_web_host}:{self.daemon_web_port}")
-        print(f"🌐 Esempio d'uso http://{self.daemon_web_host}:{self.daemon_web_port}/216.58.205.46")
+        print(f"[INFO] Avvio Web API server su http://{self.daemon_web_host}:{self.daemon_web_port}")
+        print(f"[INFO] Esempio d'uso http://{self.daemon_web_host}:{self.daemon_web_port}/216.58.205.46")
         server_address = (self.daemon_web_host, self.daemon_web_port)
         try:
             self.server = HTTPServer(server_address, GeoIPLookupHandler)
             self.server_thread = threading.Thread(target=self.server.serve_forever, daemon=True)
             self.server_thread.start()
         except OSError as e:
-            print(f"❌ Errore Web API server: {e} - Probabilmente la porta {self.daemon_web_port} è già in uso.")
+            print(f"[ERROR] Errore Web API server: {e} - Probabilmente la porta {self.daemon_web_port} è già in uso.")
             raise
         except Exception as e:
-            print(f"❌ Errore generico Web API server: {e}")
+            print(f"[ERROR] Errore generico Web API server: {e}")
 
     def stop(self):
-        print("🛑 Fermando Web API server...")
+        print("[INFO] Fermando Web API server...")
         if self.server:
             self.server.shutdown()
             if self.server_thread and self.server_thread.is_alive():
                 self.server_thread.join(timeout=1)
-        print("🛑 Web API server fermato.")
+        print("[INFO] Web API server fermato.")
