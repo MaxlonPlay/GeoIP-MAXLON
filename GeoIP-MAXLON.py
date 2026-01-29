@@ -22,6 +22,62 @@ from core.geo_web_api import GeoWebAPI
 DAEMON_PIDFILE = os.getenv('DAEMON_PIDFILE', 'geo_daemon.pid')
 
 
+def cleanup_pidfile() -> None:
+    """Rimuove il file PID in modo sicuro."""
+    try:
+        if os.path.exists(DAEMON_PIDFILE):
+            os.remove(DAEMON_PIDFILE)
+            print("[INFO] File PID rimosso.")
+    except OSError as e:
+        print(f"[WARNING] Impossibile rimuovere il file PID: {e}")
+
+
+def signal_handler(signum, frame) -> None:
+    """Gestisce i segnali di terminazione per cleanup appropriato."""
+    print(f"\n[INFO] Ricevuto segnale {signum}. Shutdown in corso...")
+    cleanup_pidfile()
+    sys.exit(0)
+
+
+def is_process_running(pid: int) -> bool:
+    """Verifica se un processo con il PID specificato è in esecuzione."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def validate_pidfile() -> bool:
+    """
+    Valida il PID file e rimuove se il processo non è in esecuzione.
+    Ritorna True se il daemon è realmente in esecuzione, False altrimenti.
+    """
+    if not os.path.exists(DAEMON_PIDFILE):
+        return False
+    
+    try:
+        with open(DAEMON_PIDFILE, 'r', encoding='utf-8') as f:
+            pid = int(f.read().strip())
+        
+        if is_process_running(pid):
+            return True
+        else:
+            print(f"[WARNING] Trovato PID file stantio (processo {pid} non esiste). Rimozione...")
+            try:
+                os.remove(DAEMON_PIDFILE)
+            except OSError as e:
+                print(f"[WARNING] Impossibile rimuovere il PID file stantio: {e}")
+            return False
+    except (IOError, ValueError) as e:
+        print(f"[WARNING] PID file corrotto: {e}. Rimozione...")
+        try:
+            os.remove(DAEMON_PIDFILE)
+        except OSError:
+            pass
+        return False
+
+
 def main() -> None:
     if len(sys.argv) < 2:
         sys.argv.append('--server')
@@ -46,7 +102,7 @@ def main() -> None:
     command: str = sys.argv[1]
 
     if command == '--server':
-        if is_daemon_running():
+        if validate_pidfile():
             print("[WARNING] Daemon già in esecuzione!")
             sys.exit(1)
         try:
@@ -77,6 +133,9 @@ def main() -> None:
             print(f"[ERROR] Errore nella scrittura del file PID: {e}")
             sys.exit(1)
 
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+
         cli_thread = threading.Thread(target=cli_server.start, daemon=True)
         web_api_thread = threading.Thread(target=web_api.start, daemon=True)
 
@@ -93,14 +152,11 @@ def main() -> None:
             print("[INFO] Inizializzazione spegnimento...")
             cli_server.stop()
             web_api.stop()
-            try:
-                os.remove(DAEMON_PIDFILE)
-            except OSError as e:
-                print(f"[WARNING] Impossibile rimuovere il file PID: {e}")
+            cleanup_pidfile()
             print("[INFO] Daemon completamente spento.")
 
     elif command == '--status':
-        if not is_daemon_running():
+        if not validate_pidfile():
             print("[ERROR] Daemon non in esecuzione")
             sys.exit(1)
 
@@ -119,7 +175,7 @@ def main() -> None:
             print(f"[ERROR] Errore: {stats.get('error', 'Errore sconosciuto')}")
 
     elif command == '--stop':
-        if not is_daemon_running():
+        if not validate_pidfile():
             print("[ERROR] Daemon non in esecuzione")
             sys.exit(1)
 
@@ -136,7 +192,7 @@ def main() -> None:
             print(f"[ERROR] Errore fermando daemon: {e}")
 
     elif command == '--dbupdate':
-        if is_daemon_running():
+        if validate_pidfile():
             print("[WARNING] Il daemon è in esecuzione. Si consiglia di fermarlo prima di aggiornare il DB.")
             print("   Per favore, ferma il daemon con 'python GeoIP-MAXLON.py --stop' e riprova.")
             sys.exit(1)
@@ -182,7 +238,7 @@ def main() -> None:
 
     else:
         ip_address: str = command
-        if not is_daemon_running():
+        if not validate_pidfile():
             print("[ERROR] Daemon non in esecuzione!")
             print("Avvia con: python GeoIP-MAXLON.py --server")
             sys.exit(1)
