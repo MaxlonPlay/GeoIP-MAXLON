@@ -1,197 +1,151 @@
 # 🌍 GeoIP-MAXLON
 
-**GeoIP-MAXLON** è un servizio ad alte prestazioni progettato per fornire **lookup quasi istantanei di indirizzi IP** in locale senza neccessità di connesione a internet grazie a  vari db pubblici come il DB ip.guide, il quale contiene informazioni geografiche e di rete come il **blocco CIDR**, il **numero di Sistema Autonomo (ASN)**, l'**organizzazione** e il **paese**.
+Un **servizio di geolocalizzazione IP** veloce e efficiente, containerizzato con Docker. Utilizza un database GeoIP per localizzare indirizzi IP e fornire informazioni geografiche.
 
-La sua architettura è ottimizzata per la velocità, caricando **tutti i dati rilevanti direttamente in RAM** per garantire risposte quasi immediate.
+![Python](https://img.shields.io/badge/python-3.11+-green.svg)
+![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
 
----
+## ✨ Features
 
-## 🚀 Caratteristiche Principali
+- 🚀 **API Web REST** per la geolocalizzazione di indirizzi IP
+- 📊 **Database GeoIP** aggiornabile automaticamente
+- 🐳 **Containerizzato con Docker** per deployment facile
+- 🌐 **Interfaccia Web** intuitiva per le ricerche
+- ⚡ **Performante** grazie a Polars per la gestione dati
+- 🔄 **Auto-updater** del database GeoIP
 
-### ⚡ Lookup In-Memory ad Alta Velocità
-- Il daemon carica **l'intero dataset GeoIP nella memoria** all'avvio.
-- Nessuna necessità di accesso al disco per ogni query.
-- Tempi di risposta estremamente rapidi per le richieste di lookup IP.
+## 🚀 Quick Start
 
----
+### Con Docker Compose (Consigliato)
 
-## 📦 Gestione Ottimizzata dei Dati
-
-- **Libreria Polars**:
-  - Utilizzata per il caricamento efficiente e la pulizia dei dati dal file CSV di origine.
-
-- **Struttura dati precomputata (`PrecomputedNetwork`)**:
-  - Rappresenta le reti IPv4 e IPv6 in un formato binario ottimizzato per i controlli di inclusione IP basati sull’aritmetica intera.
-
-- **Caching avanzato**:
-  - Salvataggio in file `.cache` che serializza le strutture dati ottimizzate.
-  - Riduce significativamente i tempi di avvio successivi se il CSV non è stato modificato.
-  - Cache dedicate per le reti IPv4 e IPv6, organizzate per intervalli di ottetti/blocchi per accelerare la ricerca.
-  - CIDR associati a ciascun ASN vengono memorizzati per un recupero rapido di tutte le reti sotto una specifica organizzazione.
-
----
-
-# GeoIP-MAXLON - Istruzioni d'Uso
-
-## Installazione
-
-## Linux
-
-### 1. Clona il repository:
 ```bash
-git clone https://github.com/MaxlonPlay/GeoIP-MAXLON.git
-cd GeoIP-MAXLON
+docker compose up -d
 ```
 
-### 2. Installa Python 3 e pip se non sono gia presenti:
+L'API sarà disponibile su `http://tuoip:8881`
 
-#### Debian / Ubuntu:
-```bash
-sudo apt update
-sudo apt install python3 python3-pip
-```
+### Manuale
 
-#### Arch / Manjaro:
 ```bash
-sudo pacman -S python python-pip
-```
-
-#### Fedora:
-```bash
-sudo dnf install python3 python3-pip
-```
-
-#### Alpine Linux:
-```bash
-sudo apk add python3 py3-pip
-```
-
-### 3. Installa le dipendenze Python:
-```bash
+# Installa dipendenze
 pip install -r requirements.txt
+
+# Avvia l'applicazione
+python GeoIP-MAXLON.py
 ```
 
-### 4. Configura il file `.env`:
+## 📝 Utilizzo
+
+### Via API REST
+
 ```bash
-nano .env
+# Lookup di un IP
+curl http://tuoip:8881/8.8.8.8
 ```
-> Modifica le variabili di configurazione secondo le tue necessità.
 
----
+### Via Web Interface
 
-## Utilizzo
+Apri il browser e vai su: `http://tuoip:8881`
 
-Per ottenere informazioni:
+## 🔧 Configurazione
+
+Le seguenti variabili d'ambiente possono essere configurate:
+
+| Variabile | Default | Descrizione |
+|-----------|---------|-------------|
+| `DAEMON_WEB_HOST` | `0.0.0.0` | Host del server web |
+| `DAEMON_WEB_PORT` | `8881` | Porta del server web |
+| `DATA_FILENAME` | `/app/data/geoip/networks.csv` | Percorso database GeoIP |
+
+### Esempio con Docker Compose
+
+```yaml
+services:
+  geolocate:
+    image: geoip-maxlon:latest
+    container_name: geoip-maxlon
+    ports:
+      - "8881:8881"
+    volumes:
+      - /data/geoip:/app/data/geoip
+    restart: unless-stopped
+```
+
+## 📦 Dipendenze
+
+- **Python 3.11+**
+- **python-dotenv** - Gestione variabili d'ambiente
+- **requests** - Client HTTP
+- **polars** - Data manipulation ad alte prestazioni
+
+
+### Esecuzione
+
 ```bash
-./GeoIP-MAXLON.py -h
+docker run -p 8881:8881 -v /data/geoip:/app/data/geoip geoip-maxlon:latest
 ```
 
-Per avviare in modalità server (risposta quasi immediata):
+### Con Docker Compose
+
 ```bash
-./GeoIP-MAXLON.py
+# Avvio
+docker compose up -d
+
+# Stop
+docker compose down
+
+# Log
+docker compose logs -f
+```
+
+## 📋 Requisiti di Sistema
+
+- **OS**: Linux, macOS, Windows (con WSL2)
+- **Memoria**: Min 2048MB RAM
+- **Spazio**: Min 500MB per il database GeoIP
+- **CPU**: 1+ core
+
+## 🚦 API Endpoints
+
+### GET /{ip}
+
+Restituisce le informazioni geografiche per un indirizzo IP.
+
+**Parametri:**
+- `ip` (string): Indirizzo IP da cercare
+
+**Risposta Success (200):**
+```json
+{
+  "success": true,
+  "ip": "8.8.8.8",
+  "country": "US",
+  "city": "Mountain View",
+  "latitude": 37.4192,
+  "longitude": -122.0574
+}
+```
+
+**Risposta Error (400):**
+```json
+{
+  "success": false,
+  "error": "Invalid IP address"
+}
+```
+
+## 🔄 Aggiornamento Database
+
+Il database GeoIP viene scaricato automaticamente da:
+```
+https://ip.guide/bulk/networks.csv
+```
+
+Per aggiornare manualmente:
+```bash
+python -m core.db_updater
 ```
 
 ---
 
-## Interfaccia Web
-
-Apri il browser e accedi a:
-```
-http://<il-tuo-ip>:<porta-servizio>/<ip-da-analizzare>
-```
-> Sostituisci `<il-tuo-ip>` con l’indirizzo IP del tuo server e `<ip-da-analizzare>` con l’IP da analizzare.
-
----
-
-## Comandi disponibili
-
-### Uso:
-```
-./GeoIP-MAXLON.py                     🔥 Avvia daemon (resta in background e abilita Web API)
-./GeoIP-MAXLON.py <IP>                ⚡ Query istantanea (usa daemon CLI)
-./GeoIP-MAXLON.py --standalone <IP>   🔧 Modalità standalone (non usa il daemon, caricamento dati al avvio modalità più lenta)
-./GeoIP-MAXLON.py --status            📊 Stato daemon
-./GeoIP-MAXLON.py --stop              🛑 Ferma daemon
-./GeoIP-MAXLON.py --dbupdate          🔄 Aggiorna il file networks.csv e la cache
-./GeoIP-MAXLON.py --help/-h           ℹ️ Ottieni info sul uso del programma
-```
-
-### Esempi:
-```
-./GeoIP-MAXLON.py
-./GeoIP-MAXLON.py 8.8.8.8
-curl http://<il-tuo-ip>:<porta-servizio>/8.8.8.8
-```
-
-> 💡 Il daemon carica tutto in RAM una volta e risponde istantaneamente!
-
-
-
-## 🔌 Interfacce Flessibili
-
-### 🖥️ Server CLI (Command Line Interface)
-- Server socket dedicato.
-- Consente ai client CLI di interrogare il daemon per:
-  - Lookup IP.
-  - Statistiche sullo stato del servizio.
-
-### 🌐 Web API
-- Server HTTP leggero che espone un'API **RESTful**.
-- Facilita l’integrazione con applicazioni o servizi web.
-- Query effettuabili tramite semplici richieste `GET`:
-- Per futuri aggiornamenti sto pensando una WEBGUI completa
-
-
----
-
-## ⚙️ Modalità Operative
-
-- **Modalità Daemon (`--server`)**:
-- Avvia il servizio in background.
-- Abilita sia il server CLI che la Web API.
-- Gestisce il proprio PID per consentire controllo da riga di comando (start/stop/status/dbupdate).
-
-- **Modalità Client (`<IP>`)**:
-- Se il daemon è in esecuzione, agisce da client.
-- Invia una query IP al server CLI del daemon e mostra i risultati.
-
-- **Modalità Standalone (`--standalone <IP>`)**:
-- Esegue un lookup IP diretto **senza interagire con il daemon**.
-- I dati vengono caricati al momento della richiesta quinti tempi di avvio maggiori a seconda della dimensione del DB.
-- Ideale per test o usi occasionali **senza avviare un servizio persistente**.
-
----
-
-## 🧾 Informazioni Dettagliate sui Risultati
-
-Per ogni lookup IP, il servizio restituisce:
-
-- Usando in locale il DB ip.guide, in future versione ho intensioni di espandelo ad altri DB
-- Blocco CIDR corrispondente
-- ASN
-- Organizzazione
-- Paese
-- Elenco di tutti gli altri CIDR associati a quell'ASN
-
----
-
-## 📊 Monitoraggio dello Stato
-
-Il daemon fornisce **statistiche dettagliate** tra cui:
-
-- Tempo di uptime
-- Numero totale di reti caricate (IPv4 e IPv6)
-- Numero totale di ASN
-- Query totali elaborate
-- Query al secondo
-- Tempo impiegato per il caricamento iniziale dei dati
-
----
-
-## ✅ In Sintesi
-
-**GeoIP-MAXLON** è una soluzione **robusta e performante** per esigenze di lookup GeoIP selfhosted, ideale per applicazioni che richiedono:
-
-- Risposte ultra rapide
-- Elevata disponibilità dei dati
-- Flessibilità nelle modalità di utilizzo
+**Made with Python 🐍 & Docker 🐳**

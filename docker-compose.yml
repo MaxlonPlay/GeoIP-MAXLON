@@ -1,0 +1,9 @@
+services:
+  geolocate:
+    image: maxlonplay/geoip-maxlon:latest
+    container_name: geoip-maxlon
+    ports:
+      - "8881:8881"
+    volumes:
+      - /data/geoip:/app/data/geoip
+    restart: unless-stopped
