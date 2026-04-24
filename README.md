@@ -62,7 +62,7 @@ Le seguenti variabili d'ambiente possono essere configurate:
 ```yaml
 services:
   geolocate:
-    image: geoip-maxlon:latest
+    image: maxlonplay/geoip-maxlon:latest
     container_name: geoip-maxlon
     ports:
       - "8881:8881"
@@ -82,7 +82,7 @@ services:
 ### Esecuzione
 
 ```bash
-docker run -p 8881:8881 -v /data/geoip:/app/data/geoip geoip-maxlon:latest
+docker run -p 8881:8881 -v /data/geoip:/app/data/geoip maxlonplay/geoip-maxlon:latest
 ```
 
 ### Con Docker Compose
